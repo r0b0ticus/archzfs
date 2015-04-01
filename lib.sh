@@ -2,8 +2,6 @@ shopt -s nullglob
 
 # check if messages are to be printed using color
 unset ALL_OFF BOLD BLUE GREEN RED YELLOW
-
-# prefer terminal safe colored and bold text when tput is supported
 ALL_OFF="$(tput sgr0 2> /dev/null)"
 BOLD="$(tput bold 2> /dev/null)"
 BLUE="${BOLD}$(tput setaf 4 2> /dev/null)"

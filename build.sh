@@ -17,6 +17,7 @@ AZB_SIGN=""
 AZB_CLEANUP=0
 AZB_MODE_GIT=0
 AZB_MODE_LTS=0
+SNAME=$(basename $0)
 
 source ./lib.sh
 source ./conf.sh
@@ -25,39 +26,41 @@ trap 'trap_abort' INT QUIT TERM HUP
 trap 'trap_exit' EXIT
 
 usage() {
-	echo "build.sh - A build script for archzfs"
-    echo
-	echo "Usage: build.sh [options] [mode] [command [command option] [...]"
-    echo
-    echo "Options:"
-    echo
-    echo "    -h:    Show help information."
-    echo "    -n:    Dryrun; Output commands, but don't do anything."
-    echo "    -d:    Show debug info."
-    echo "    -u:    Perform an update in the clean chroot."
-    echo "    -U:    Uses updpkgsums on PKGBUILDS."
-    echo "    -C:    Remove all files that are not package sources."
-    echo
-    echo "Modes:"
-    echo
-    echo "    git    Use the git packages."
-    echo "    lts    Use the lts packages."
-    echo
-    echo "Commands:"
-    echo
-    echo "    make          Build all packages."
-    echo "    test          Build test packages."
-    echo "    update        Update all git PKGBUILDs using conf.sh variables."
-    echo "    update-test   Update all git PKGBUILDs using the testing conf.sh variables."
-    echo "    sign          GPG detach sign all compiled packages (default)."
-    echo
-	echo "Examples:"
-    echo
-    echo "    build.sh -C                       :: Remove all compiled packages"
-    echo "    build.sh git make -u              :: Update the chroot and build all of the packages"
-    echo "    build.sh lts update               :: Update PKGBUILDS only"
-    echo "    build.sh git update make -u       :: Update PKGBUILDs, update the chroot, and make all of the packages"
-    echo "    build.sh lts update-test test -u  :: Update PKGBUILDs (use testing versions), update the chroot, and make all of the packages"
+cat << EOF
+$SNAME - A build script for archzfs
+
+Usage: $SNAME [options] [mode] [command [command option] [...]
+
+Options:
+
+    -h:    Show help information.
+    -n:    Dryrun; Output commands, but don't do anything.
+    -d:    Show debug info.
+    -u:    Perform an update in the clean chroot.
+    -U:    Uses updpkgsums on PKGBUILDS.
+    -C:    Remove all files that are not package sources.
+
+Modes:
+
+    git    Use the git packages.
+    lts    Use the lts packages.
+
+Commands:
+
+    make          Build all packages.
+    test          Build test packages.
+    update        Update all git PKGBUILDs using conf.sh variables.
+    update-test   Update all git PKGBUILDs using the testing conf.sh variables.
+    sign          GPG detach sign all compiled packages (default).
+
+Examples:
+
+    $SNAME -C                       :: Remove all compiled packages
+    $SNAME git make -u              :: Update the chroot and build all of the packages
+    $SNAME lts update               :: Update PKGBUILDS only
+    $SNAME git update make -u       :: Update PKGBUILDs, update the chroot, and make all of the packages
+    $SNAME lts update-test test -u  :: Update PKGBUILDs (use testing versions), update the chroot, and make all of the packages
+EOF
 }
 
 sed_escape_input_string() {
