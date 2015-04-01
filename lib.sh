@@ -12,7 +12,7 @@ readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
 
 plain() {
 	local mesg=$1; shift
-	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${BOLD}     ${mesg}${ALL_OFF}\n" "$@"
 }
 
 msg() {
@@ -56,13 +56,11 @@ debug() {
 run_cmd() {
     # $1: The command to run
     if [[ $DRY_RUN -eq 1 ]]; then
-        for pos in $@; do
-            plain $pos
-        done
+        plain "%s" "command: $@"
     else
-        plain "Running command: $@"
+        plain "%s" "Command: $@"
         eval "$@"
-        plain "Command returned: $?"
+        plain "%s" "Returned: $?"
     fi
 }
 
