@@ -54,15 +54,26 @@ debug() {
 }
 
 run_cmd() {
-    # $1: The command to run
-    if [[ $DRY_RUN -eq 1 ]]; then
-        plain "%s" "command: $@"
-    else
-        plain "%s" "Command: $@"
-        eval "$@"
-        plain "%s" "Returned: $?"
+    # $1: The format specifier (optional)
+    # $@: The output text
+    # Returns the commands return code
+    local ret=0
+    local spec="%s"
+    if [[ "$#" > 1 ]]; then
+        spec="$1"
+        shift
     fi
+    if [[ "$DRY_RUN" == 1 ]]; then
+        plain "$spec" "command: $@"
+    else
+        plain "$spec" "command: $@"
+        eval "$@"
+        ret=$?
+        plain "%s" "return: $ret"
+    fi
+    return $ret
 }
+
 
 cleanup() {
 	# [[ -n $WORKDIR ]] && rm -rf "$WORKDIR"
