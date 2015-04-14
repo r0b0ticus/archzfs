@@ -3,5 +3,5 @@
 *.log
 */spl
 */zfs
-testing/
 src/
+testdata/packer_cache

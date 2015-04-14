@@ -1,0 +1,3 @@
+testdata/packer_cache
+*.box
+mirrorlist
