@@ -25,11 +25,5 @@
             "ssh_password": "vagrant",
             "shutdown_command": "systemctl start poweroff.timer"
         }
-    ],
-    "post-processors": [
-        {
-            "type": "vagrant",
-            "output": "packer_arch_{{.Provider}}_{{isotime '2006-01-02-1504'}}.box"
-        }
     ]
 }
