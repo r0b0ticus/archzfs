@@ -38,6 +38,7 @@ echo "==> Setting archiso pacman mirror"
 
 echo "==> Setting the package cache (nfs mount)"
 mount -t nfs4 -o rsize=32768,wsize=32768,timeo=3 10.0.2.2:/var/cache/pacman/pkg /var/cache/pacman/pkg
+mount -t nfs4 -o rsize=32768,wsize=32768,timeo=3 10.0.2.2:/var/cache/pacman/pkg /mnt/var/cache/pacman/pkg
 
 echo '==> bootstrapping the base installation'
 /usr/bin/pacstrap -c ${TARGET_DIR} base base-devel
@@ -46,7 +47,7 @@ echo '==> bootstrapping the base installation'
 /usr/bin/sed -i 's/sda3/vda1/' "${TARGET_DIR}/boot/syslinux/syslinux.cfg"
 /usr/bin/sed -i 's/TIMEOUT 50/TIMEOUT 10/' "${TARGET_DIR}/boot/syslinux/syslinux.cfg"
 
-echo "==> Setting base image pacman mirror"
+echo '==> Setting base image pacman mirror'
 /usr/bin/cp /etc/pacman.d/mirrorlist ${TARGET_DIR}/etc/pacman.d/mirrorlist
 
 echo '==> generating the filesystem table'

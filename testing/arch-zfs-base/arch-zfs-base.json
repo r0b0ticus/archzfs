@@ -10,7 +10,7 @@
             "iso_url": "{{user `iso_url`}}",
             "iso_checksum": "{{user `iso_checksum`}}",
             "iso_checksum_type": "{{user `iso_checksum_type`}}",
-            "http_directory": ".",
+            "http_directory": "../testdata/files",
             "boot_wait": "5s",
             "headless": false,
             "boot_command": [
@@ -22,7 +22,7 @@
             ],
             "disk_size": 122880,
             "ssh_username": "root",
-            "ssh_password": "vagrant",
+            "ssh_password": "azfstest",
             "shutdown_command": "systemctl start poweroff.timer"
         }
     ]

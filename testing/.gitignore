@@ -1,4 +1,3 @@
 testdata/packer_cache
-*.box
 mirrorlist
-output-qemu/
+*.qcow2

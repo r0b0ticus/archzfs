@@ -6,11 +6,11 @@ AZB_MODE_LTS=0
 AZB_PKG_TYPE=""
 AZB_TEST_PKG_WORKDIR="archzfs"
 
-export PACKER_CACHE_DIR="../../testdata/packer_cache"
+export PACKER_CACHE_DIR="../testdata/packer_cache"
 
 SNAME=$(basename $0)
 
-source ../../lib.sh
+source ../lib.sh
 
 trap 'trap_abort' INT QUIT TERM HUP
 trap 'trap_exit' EXIT
@@ -85,7 +85,7 @@ copy_latest_packages() {
 if [[ $AZB_BASE == 1 ]]; then
     if [[ -z mirrorlist ]]; then
         msg "Generating pacman mirrorlist"
-        /usr/bin/reflector -c US -l 5 -f 5 --sort rate 2>&1 | tee mirrorlist
+        /usr/bin/reflector -c US -l 5 -f 5 --sort rate 2>&1 | tee testdata/files/mirrorlist
     fi
 
     msg "Building arch base image"
