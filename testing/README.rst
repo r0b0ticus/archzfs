@@ -1,7 +1,7 @@
 =====================
 archzfs testing guide
 =====================
-:Modified: Sat Apr 18 22:41 2015
+:Modified: Sun Apr 19 11:24 2015
 
 --------
 Overview
@@ -55,6 +55,10 @@ To run the test automation, the following items are required:
 * sshpass
 
   To allow automated ssh logins.
+
+* ksh
+
+  From AUR, needed for zfs-test
 
 ----------------------
 Build and test process

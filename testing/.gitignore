@@ -1,3 +1,4 @@
 testdata/packer_cache
 mirrorlist
 *.qcow2
+archzfs/

@@ -1,10 +1,18 @@
 #!/bin/bash
 
 AZT_TEST=0
+AZT_BASE=0
 AZT_MODE_GIT=0
 AZT_MODE_LTS=0
 AZT_PKG_TYPE=""
 AZT_TEST_PKG_WORKDIR="archzfs"
+
+# SSH config
+SSH_OPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+SSH_OPTS="$SSH_OPTS -o ConnectTimeout=3 -p 2222"
+SSH="/usr/sbin/ssh $SSH_OPTS"
+AZT_SSH_PASS="sshpass -p azfstest"
+AZT_SSH="$AZT_SSH_PASS $SSH"
 
 # For building the base image
 export AZT_ARCHISO="https://mirrors.kernel.org/archlinux/iso/2015.04.01/archlinux-2015.04.01-dual.iso"
@@ -12,8 +20,10 @@ export AZT_ARCHISO_SHA="95122cbbde7252959bcea1c49fd797eb0eb25a4b"
 export AZT_PACKER_HTTPDIR="$PWD/testdata/files"
 
 AZT_ARCHISO_BASENAME=$(basename $AZT_ARCHISO)
-export AZT_BASE_IMAGE_NAME="archzfs-base-${AZT_ARCHISO_BASENAME:10:-9}"
+export AZT_BASE_IMAGE_BASENAME="archzfs-base-${AZT_ARCHISO_BASENAME:10:-9}"
 export AZT_BASE_IMAGE_OUTPUT_DIR="$PWD/testdata/base"
+AZT_BASE_IMAGE_NAME="$AZT_BASE_IMAGE_OUTPUT_DIR/${AZT_BASE_IMAGE_BASENAME}.qcow2"
+AZT_WORK_IMAGE_RANDNAME="$AZT_BASE_IMAGE_OUTPUT_DIR/${AZT_BASE_IMAGE_BASENAME}_${RANDOM}.qcow2"
 
 export PACKER_CACHE_DIR="$PWD/testdata/packer_cache"
 
@@ -23,6 +33,7 @@ source ../lib.sh
 
 cleanup() {
     [[ -f "$PWD/testdata/files/setup-test-image.sh" ]] && rm "$PWD/testdata/files/setup-test-image.sh"
+    [[ -f "$AZT_WORK_IMAGE_RANDNAME" ]] && rm "$AZT_WORK_IMAGE_RANDNAME"
 	[[ $1 ]] && exit $1
 }
 
@@ -80,7 +91,7 @@ for (( a = 0; a < $#; a++ )); do
     fi
 done
 
-[[ $AZT_MODE_GIT == 0 && $AZT_MODE_LTS == 0 && $AZT_BASE == 0 ]] && error "Mode not specified!" && exit 1;
+[[ $AZT_MODE_GIT == 0 && $AZT_MODE_LTS == 0 && $AZT_BASE == 0 ]] && error "Mode not specified!" && usage && exit 1;
 [[ $AZT_MODE_GIT == 1 ]] && AZT_PKG_TYPE="git" || AZT_PKG_TYPE="lts"
 # [[ $AZT_TEST == 0 ]] && warning "No commands were used!"
 
@@ -112,30 +123,49 @@ if [[ $AZT_BASE == 1 ]]; then
 fi
 
 if [[ $AZT_TEST == 1 ]]; then
-    # msg "Copying latest packages"
-    # copy_latest_packages
+    msg "Testing $AZT_PKG_TYPE packages"
 
-    # msg "Building arch base image with archzfs $AZT_PKG_TYPE packages"
-    # run_cmd "packer build arch.json"
+    msg2 "Copying latest $AZT_PKG_TYPE packages"
+    copy_latest_packages
+    if [[ $(ls $AZT_TEST_PKG_WORKDIR/x64/ | wc -w) == 0 ]]; then
+        error "No $AZT_PKG_TYPE packages found in $AZT_TEST_PKG_WORKDIR/x64/"
+        exit 1
+    fi
+
+    msg2 "Cloning $AZT_BASE_IMAGE_NAME"
+    run_cmd "cp $AZT_BASE_IMAGE_NAME $AZT_WORK_IMAGE_RANDNAME"
+
+    msg "Booting VM clone..."
     cmd="qemu-system-x86_64 -enable-kvm "
     cmd="$cmd -m 4096 -smp 2 -redir tcp:2222::22 -drive "
-    cmd="$cmd file=$AZT_BASE_IMAGE_OUTPUT_DIR/$AZT_BASE_IMAGE_NAME.qcow2,if=virtio"
+    cmd="$cmd file=$AZT_WORK_IMAGE_RANDNAME,if=virtio"
     run_cmd "$cmd" &
+
+    sleep 2;
 
     if [[ -z "$DEBUG" ]]; then
         msg "Waiting for SSH..."
         while :; do
-            run_cmd "sshpass -p azfstest \ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 root@localhost echo &> /dev/null"
-            ret=$?
-            echo "YO: "$ret
-            if [[ $ret == 0 ]]; then
+            run_cmd "$AZT_SSH root@localhost echo &> /dev/null"
+            if [[ $? == 0 ]]; then
                 break
             fi
-            sleep 3
         done
     fi
-    msg2 "we housin"
-    sshpass -p azfstest \ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 root@localhost systemctl poweroff #&> /dev/null
+
+    msg2 "Copying the latest packages to the VM"
+    copy_latest_packages
+    run_cmd "rsync -vrthP -e '$AZT_SSH' archzfs/x64/ root@localhost:"
+    run_cmd "$AZT_SSH root@localhost pacman -U --noconfirm '*.pkg.tar.xz'"
+
+    msg2 "Cloning ZFS test suite"
+    run_cmd "$AZT_SSH root@localhost git clone https://github.com/zfsonlinux/zfs-test.git"
+
+    # msg2 "Building ZFS test suite"
+    # run_cmd "$AZT_SSH root@localhost 'cd zfs-test && ./autogen.sh && ./configure && make test'"
+
+    # msg2 "Cause I'm housin"
+    # run_cmd "$AZT_SSH root@localhost systemctl poweroff &> /dev/null"
 fi
 
 wait

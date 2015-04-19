@@ -11,6 +11,9 @@ CONFIG_SCRIPT='/usr/local/bin/arch-config.sh'
 ROOT_PARTITION="${DISK}1"
 TARGET_DIR='/mnt'
 
+# Additional packages to install after base and base-devel
+PACKAGES="ksh gptfdisk openssh syslinux parted lsscsi rsync vim git tmux htop tree"
+
 echo "==> clearing partition table on ${DISK}"
 /usr/bin/sgdisk --zap ${DISK}
 
@@ -42,7 +45,7 @@ mount -t nfs4 -o rsize=32768,wsize=32768,timeo=3 10.0.2.2:/var/cache/pacman/pkg 
 
 echo '==> bootstrapping the base installation'
 /usr/bin/pacstrap -c ${TARGET_DIR} base base-devel
-/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm gptfdisk openssh syslinux parted lsscsi rsync
+/usr/bin/arch-chroot ${TARGET_DIR} pacman -S --noconfirm $PACKAGES
 /usr/bin/arch-chroot ${TARGET_DIR} syslinux-install_update -i -a -m
 /usr/bin/sed -i 's/sda3/vda1/' "${TARGET_DIR}/boot/syslinux/syslinux.cfg"
 /usr/bin/sed -i 's/TIMEOUT 50/TIMEOUT 10/' "${TARGET_DIR}/boot/syslinux/syslinux.cfg"
@@ -72,10 +75,12 @@ cat <<-EOF > "${TARGET_DIR}${CONFIG_SCRIPT}"
     /usr/bin/systemctl enable sshd.service
 
     # zfs-test configuration
-    /usr/bin/groupadd zfs-test
-    /usr/bin/useradd --password ${PASSWORD} --comment 'ZFS Test User' --create-home --gid users --groups zfs-test zfs-test
+    /usr/bin/groupadd zfs-tests
+    /usr/bin/useradd --comment 'ZFS Test User' -d /var/tmp/test_results --gid users --groups zfs-tests zfs-tests
+
+    # sudoers.d is the right way, but the zfs test suite checks /etc/sudoers...
     echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10_zfs_test
-    echo 'zfs-test ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10_zfs_test
+    echo 'zfs-tests ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10_zfs_test
     /usr/bin/chmod 0440 /etc/sudoers.d/10_zfs_test
 
     # clean up
