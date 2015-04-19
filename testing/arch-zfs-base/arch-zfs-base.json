@@ -1,8 +1,11 @@
 {
     "variables": {
-        "iso_url": "https://mirrors.kernel.org/archlinux/iso/2015.04.01/archlinux-2015.04.01-dual.iso",
-        "iso_checksum": "95122cbbde7252959bcea1c49fd797eb0eb25a4b",
-        "iso_checksum_type": "sha1"
+        "http_dir": "{{env `AZT_PACKER_HTTPDIR`}}",
+        "iso_url": "{{env `AZT_ARCHISO`}}",
+        "iso_checksum": "{{env `AZT_ARCHISO_SHA`}}",
+        "iso_checksum_type": "sha1",
+        "base_image_name": "{{env `AZT_BASE_IMAGE_NAME`}}",
+        "base_image_output_dir": "{{env `AZT_BASE_IMAGE_OUTPUT_DIR`}}"
     },
     "builders": [
         {
@@ -10,7 +13,7 @@
             "iso_url": "{{user `iso_url`}}",
             "iso_checksum": "{{user `iso_checksum`}}",
             "iso_checksum_type": "{{user `iso_checksum_type`}}",
-            "http_directory": "../testdata/files",
+            "http_directory": "{{user `http_dir`}}",
             "boot_wait": "5s",
             "headless": false,
             "boot_command": [
@@ -23,7 +26,9 @@
             "disk_size": 122880,
             "ssh_username": "root",
             "ssh_password": "azfstest",
-            "shutdown_command": "systemctl start poweroff.timer"
+            "shutdown_command": "systemctl start poweroff.timer",
+            "vm_name": "{{user `base_image_name`}}",
+            "output_directory": "{{user `base_image_output_dir`}}"
         }
     ]
 }

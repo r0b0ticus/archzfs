@@ -1,10 +1,10 @@
 #!/usr/bin/env bash -e
 
 DISK='/dev/vda'
-FQDN='vagrant-arch.vagrantup.com'
+FQDN='test.archzfs.test'
 KEYMAP='us'
 LANGUAGE='en_US.UTF-8'
-PASSWORD=$(/usr/bin/openssl passwd -crypt 'vagrant')
+PASSWORD=$(/usr/bin/openssl passwd -crypt 'azfstest')
 TIMEZONE='UTC'
 
 CONFIG_SCRIPT='/usr/local/bin/arch-config.sh'

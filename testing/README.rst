@@ -1,7 +1,7 @@
 =====================
 archzfs testing guide
 =====================
-:Modified: Sat Apr 18 13:56 2015
+:Modified: Sat Apr 18 22:41 2015
 
 --------
 Overview
@@ -51,6 +51,10 @@ To run the test automation, the following items are required:
 * packer
 
   Used to build the base image from the latest archiso. Install from AUR.
+
+* sshpass
+
+  To allow automated ssh logins.
 
 ----------------------
 Build and test process
