@@ -1,7 +1,19 @@
 =====================
 archzfs testing guide
 =====================
-:Modified: Sun Apr 19 11:24 2015
+:Modified: Sun Apr 19 20:05 2015
+
+-----
+Notes
+-----
+
+- Sun Apr 19 19:45 2015: Found more tests at https://github.com/behlendorf/xfstests
+
+  Requires additional pools
+
+- Sun Apr 19 19:51 2015: ztest slides http://blog.delphix.com/csiden/files/2012/01/ZFS_Backward_Compatability_Testing.pdf
+
+- Sun Apr 19 20:05 2015: What I am trying to do is described here: https://github.com/zfsonlinux/zfs/issues/1534
 
 --------
 Overview
@@ -57,6 +69,10 @@ To run the test automation, the following items are required:
   To allow automated ssh logins.
 
 * ksh
+
+  From AUR, needed for zfs-test
+
+* python2.6
 
   From AUR, needed for zfs-test
 

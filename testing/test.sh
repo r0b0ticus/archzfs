@@ -159,10 +159,12 @@ if [[ $AZT_TEST == 1 ]]; then
     run_cmd "$AZT_SSH root@localhost pacman -U --noconfirm '*.pkg.tar.xz'"
 
     msg2 "Cloning ZFS test suite"
-    run_cmd "$AZT_SSH root@localhost git clone https://github.com/zfsonlinux/zfs-test.git"
+    run_cmd "$AZT_SSH root@localhost git clone https://github.com/zfsonlinux/zfs-test.git /usr/src/zfs-test"
+    run_cmd "$AZT_SSH root@localhost chown -R zfs-tests: /usr/src/zfs-test/"
 
-    # msg2 "Building ZFS test suite"
-    # run_cmd "$AZT_SSH root@localhost 'cd zfs-test && ./autogen.sh && ./configure && make test'"
+    msg2 "Building ZFS test suite"
+    run_cmd "$AZT_SSH root@localhost 'cd /usr/src/zfs-test && ./autogen.sh && ./configure'"
+    # run_cmd "$AZT_SSH root@localhost 'cd /usr/src/zfs-test && ./autogen.sh && ./configure && make test'"
 
     # msg2 "Cause I'm housin"
     # run_cmd "$AZT_SSH root@localhost systemctl poweroff &> /dev/null"
