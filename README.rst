@@ -1,8 +1,6 @@
 Zettabyte File System for Arch Linux
 ====================================
 
-Homepage: http://demizerone.com/archzfs
-
 These are the sources and packages for the ZFS filesystem support for Arch
 Linux.
 
